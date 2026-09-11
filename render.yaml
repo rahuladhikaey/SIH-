@@ -17,7 +17,7 @@ services:
       - key: MONGODB_URI
         sync: false # Set this in Render Dashboard (e.g. mongodb+srv://...)
       - key: FRONTEND_URL
-        value: https://medmitra-frontend.onrender.com
+        value: https://medmitra-frontend-eue6.onrender.com
       - key: AI_SERVICE_URL
         fromService:
           type: web

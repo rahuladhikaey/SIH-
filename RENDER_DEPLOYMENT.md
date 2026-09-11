@@ -50,7 +50,7 @@ Render will automatically provision and deploy:
 ## 🌐 Render Live Endpoints Overview
 
 Once deployed, your services will be available at:
-- **Frontend App**: `https://medmitra-frontend.onrender.com`
+- **Frontend App**: `https://medmitra-frontend-eue6.onrender.com`
 - **Backend API**: `https://medmitra-backend.onrender.com/api/v1`
 - **Backend Swagger Docs**: `https://medmitra-backend.onrender.com/api-docs`
 - **AI Service**: `https://medmitra-ai-service.onrender.com`

@@ -1,0 +1,16 @@
+CLINICAL PRACTICE GUIDELINE: OUTPATIENT ANTIBIOTIC DOSING & PRECAUTIONS
+
+1. Respiratory Tract Infections (Community-Acquired Pneumonia / Bronchitis / Sinusitis)
+- Amoxicillin: 500mg orally every 8 hours (TID) or 875mg every 12 hours (BID) for 5-7 days.
+- Amoxicillin-Clavulanate (Augmentin): 625mg TID or 1000mg BID for 7 days when beta-lactamase producing organisms are suspected.
+- Azithromycin: 500mg on Day 1, followed by 250mg daily on Days 2-5 (5-day course).
+  - Precaution: Check baseline ECG if history of long QT syndrome.
+
+2. Penicillin Allergy Protocols
+- If Mild Non-IgE Reaction (e.g. maculopapular rash): Cefdinir 300mg BID or Cefpodoxime 200mg BID.
+- If Severe Anaphylactic IgE Reaction (e.g. hives, bronchospasm, angioedema): Avoid all beta-lactams. Use Levofloxacin 500mg daily or Azithromycin 500mg daily.
+
+3. General Safety Rules & Stewardship
+- Always verify patient medication allergies prior to prescribing antibiotics.
+- Always check age-appropriate and renal-adjusted dosage.
+- Incomplete antibiotic courses lead to bacterial resistance; emphasize treatment compliance.

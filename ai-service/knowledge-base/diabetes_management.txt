@@ -1,0 +1,20 @@
+CLINICAL PRACTICE GUIDELINE: TYPE 2 DIABETES MELLITUS MANAGEMENT
+
+1. Diagnostic Criteria
+- Fasting Plasma Glucose (FPG) >= 126 mg/dL (7.0 mmol/L)
+- 2-hour Post-Prandial Glucose >= 200 mg/dL (11.1 mmol/L)
+- Glycated Hemoglobin (HbA1c) >= 6.5% (48 mmol/mol)
+
+2. First-Line Pharmacotherapy
+- Metformin: Initial dose 500mg once or twice daily with meals. Titrate gradually to max 2000mg daily.
+  - Caution: Check renal function (eGFR < 30 mL/min/1.73m2 is absolute contraindication).
+  - Side Effects: Gastrointestinal upset, vitamin B12 deficiency with long-term use.
+- Second-Line Add-ons (if HbA1c remains above target after 3 months):
+  - SGLT2 Inhibitors (e.g., Empagliflozin 10mg daily, Dapagliflozin 10mg daily): Proven cardiovascular and renal protection.
+  - GLP-1 Receptor Agonists (e.g., Semaglutide, Liraglutide): Weight reduction benefit.
+  - Sulfonylureas (e.g., Glimepiride 1-4mg daily, Gliclazide 30-120mg daily): Monitor closely for hypoglycemia.
+
+3. Hypoglycemia Management & Warning Signs
+- Hypoglycemia is defined as blood glucose < 70 mg/dL (3.9 mmol/L).
+- Symptoms: Tremors, sweating, palpitations, confusion, dizziness.
+- Treatment: Rule of 15 (15g fast-acting carbohydrate, recheck glucose in 15 minutes).

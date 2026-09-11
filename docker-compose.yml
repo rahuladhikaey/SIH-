@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo:7.0
+    container_name: medmitra_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: medmitra
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - medmitra_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: medmitra_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    networks:
+      - medmitra_net
+
+  backend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/backend.Dockerfile
+    container_name: medmitra_backend
+    restart: always
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/medmitra
+      - JWT_SECRET=${JWT_SECRET:-medmitra_phase2_super_secret_jwt_key_2026}
+      - JWT_EXPIRES_IN=24h
+      - NODE_ENV=production
+      - PORT=5000
+      - FRONTEND_URL=http://localhost
+      - AI_SERVICE_URL=http://ai-service:8000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - mongo
+      - redis
+    networks:
+      - medmitra_net
+
+  ai-service:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/ai-service.Dockerfile
+    container_name: medmitra_ai_service
+    restart: always
+    ports:
+      - "8000:8000"
+    networks:
+      - medmitra_net
+
+  frontend:
+    build:
+      context: .
+      dockerfile: infrastructure/docker/frontend.Dockerfile
+    container_name: medmitra_frontend
+    restart: always
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - medmitra_net
+
+volumes:
+  mongo_data:
+
+networks:
+  medmitra_net:
+    driver: bridge

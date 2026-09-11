@@ -1,0 +1,18 @@
+CLINICAL PRACTICE GUIDELINE: MANAGEMENT OF HYPERTENSION
+
+1. Overview & Classification
+Hypertension is defined as resting systolic blood pressure >= 140 mmHg or diastolic blood pressure >= 90 mmHg.
+Normal BP: < 120/80 mmHg.
+Stage 1 Hypertension: 130-139 / 80-89 mmHg.
+Stage 2 Hypertension: >= 140 / >= 90 mmHg.
+Hypertensive Urgency/Crisis: Systolic > 180 or Diastolic > 120 mmHg without acute target organ damage. Requires immediate clinical triage.
+
+2. Pharmacotherapy First-Line Agents
+- ACE Inhibitors (e.g., Enalapril 5-20mg daily, Lisinopril 10-40mg daily): Preferred in diabetic nephropathy. Contraindicated in pregnancy.
+- Angiotensin Receptor Blockers (ARBs) (e.g., Telmisartan 40-80mg daily, Losartan 50-100mg daily): Alternative if ACE inhibitors cause persistent dry cough.
+- Calcium Channel Blockers (CCBs) (e.g., Amlodipine 5-10mg daily): Highly effective in elderly patients.
+- Thiazide Diuretics (e.g., Chlorthalidone 12.5-25mg daily, Hydrochlorothiazide 12.5-25mg daily): Monitor serum potassium levels.
+
+3. Monitoring & Safety Precautions
+- Check renal function (creatinine, eGFR) and electrolytes (potassium, sodium) within 2 weeks of starting ACEi or ARBs.
+- Any patient presenting with chest pain, shortness of breath, severe headache, or confusion alongside high BP must be evaluated urgently.

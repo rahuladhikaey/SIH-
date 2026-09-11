@@ -1,0 +1,18 @@
+CLINICAL PRACTICE GUIDELINE: PEDIATRIC DOSAGE & SAFETY RULES
+
+1. Overview & Weight-Based Dosing
+Pediatric dosages must always be calculated based on body weight (mg/kg) or body surface area (m²).
+Never exceed adult maximum single or daily dose limits.
+Always verify patient age and exact weight in kilograms before prescribing or administering medications.
+
+2. Common Pediatric Anti-Infective & Antipyretic Dosages
+- Paracetamol (Acetaminophen): 10 to 15 mg/kg per dose orally every 4 to 6 hours as needed. Maximum 75 mg/kg/day or 4000 mg/day.
+- Ibuprofen: 5 to 10 mg/kg per dose orally every 6 to 8 hours. Maximum 40 mg/kg/day. Contraindicated in severe dehydration or infants under 6 months.
+- Amoxicillin: 45 to 90 mg/kg/day divided into 2 to 3 doses for acute otitis media or respiratory infections.
+- Azithromycin: 10 mg/kg on day 1 (max 500mg), followed by 5 mg/kg daily on days 2-5 (max 250mg/day).
+
+3. High-Risk Safety Warnings & Contraindications
+- Aspirin (Acetylsalicylic Acid): Strictly contraindicated in children and teenagers under 19 years due to risk of Reye's Syndrome during viral illnesses.
+- Tetracyclines / Doxycycline: Generally avoided in children under 8 years of age due to potential dental enamel staining and bone growth inhibition.
+- Fluoroquinolones (Ciprofloxacin, Levofloxacin): Avoid routine pediatric use due to risk of cartilage injury unless no alternative exists.
+- Codeine & Tramadol: Strictly contraindicated in pediatric patients under 12 years due to risk of severe respiratory depression.

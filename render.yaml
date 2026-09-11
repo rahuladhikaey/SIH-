@@ -17,15 +17,12 @@ services:
       - key: MONGODB_URI
         sync: false # Set this in Render Dashboard (e.g. mongodb+srv://...)
       - key: FRONTEND_URL
-        fromService:
-          type: web
-          name: medmitra-frontend
-          property: url
+        value: https://medmitra-frontend.onrender.com
       - key: AI_SERVICE_URL
         fromService:
           type: web
           name: medmitra-ai-service
-          property: url
+          property: host
       - key: REDIS_URL
         fromService:
           type: redis
@@ -56,11 +53,7 @@ services:
         destination: /index.html
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: medmitra-backend
-          property: url
-          append: /api/v1
+        value: https://medmitra-backend.onrender.com/api/v1
 
   # 4. Redis Key-Value Store (For BullMQ Job Queue)
   - type: redis

@@ -11,7 +11,9 @@ export const config = {
   jwtSecret: process.env.JWT_SECRET || '',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '24h',
   frontendUrl: process.env.FRONTEND_URL || 'http://localhost:3000',
-  aiServiceUrl: process.env.AI_SERVICE_URL || 'http://localhost:8000',
+  aiServiceUrl: process.env.AI_SERVICE_URL
+    ? (process.env.AI_SERVICE_URL.startsWith('http') ? process.env.AI_SERVICE_URL : `http://${process.env.AI_SERVICE_URL}`)
+    : 'http://localhost:8000',
   redis: {
     url: process.env.REDIS_URL || undefined,
     host: process.env.REDIS_HOST || 'localhost',

@@ -14,27 +14,69 @@ import {
   CheckCircle2,
   AlertCircle,
   Plus,
-  RefreshCw,
   Play,
   File as FileIcon,
-  ShieldCheck,
   Activity,
-  Sparkles,
   User,
   Calendar,
   X,
   Stethoscope,
-  ChevronRight,
   FolderOpen,
 } from 'lucide-react';
+
+// Medical Case Components & Types
+import { MedicalCase, PrescriptionItem, DiagnosisItem, ReportItem, DoctorNoteItem } from '../components/case/types';
+import { INITIAL_MEDICAL_CASES } from '../components/case/mockData';
+import { MedicalCaseCard } from '../components/case/MedicalCaseCard';
+import { AddRecordModal } from '../components/case/AddRecordModal';
+import { AddPrescriptionModal } from '../components/case/AddPrescriptionModal';
+import { AddDiagnosisModal } from '../components/case/AddDiagnosisModal';
+import { AddReportModal } from '../components/case/AddReportModal';
+import { AddDoctorNoteModal } from '../components/case/AddDoctorNoteModal';
+import { PrescriptionHistoryModal } from '../components/case/PrescriptionHistoryModal';
+import { RecordHistoryModal } from '../components/case/RecordHistoryModal';
+import { DocumentPreviewModal } from '../components/case/DocumentPreviewModal';
+import { CaseDetailsModal } from '../components/case/CaseDetailsModal';
 
 export const PatientPortal: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('history');
   const [profile, setProfile] = useState<any>(null);
-  const [consultations, setConsultations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Upload & Form State
+  // Local Mock State for Medical Cases (Frontend Only)
+  const [medicalCases, setMedicalCases] = useState<MedicalCase[]>(INITIAL_MEDICAL_CASES);
+
+  // Selected Case for Modal Interactivity
+  const [selectedCase, setSelectedCase] = useState<MedicalCase | null>(null);
+
+  // Active Modals Control
+  const [showAddRecordPicker, setShowAddRecordPicker] = useState(false);
+  const [showAddPrescription, setShowAddPrescription] = useState(false);
+  const [showAddDiagnosis, setShowAddDiagnosis] = useState(false);
+  const [showAddReport, setShowAddReport] = useState(false);
+  const [showAddNote, setShowAddNote] = useState(false);
+
+  // History Modals Control
+  const [showPrescriptionHistory, setShowPrescriptionHistory] = useState(false);
+  const [recordHistoryType, setRecordHistoryType] = useState<'diagnoses' | 'reports' | 'notes' | null>(null);
+  const [showCompleteCase, setShowCompleteCase] = useState(false);
+
+  // Document Preview Modal State
+  const [previewDoc, setPreviewDoc] = useState<{
+    isOpen: boolean;
+    title: string;
+    date: string;
+    doctorName?: string;
+    fileName: string;
+    notes?: string;
+  }>({
+    isOpen: false,
+    title: '',
+    date: '',
+    fileName: '',
+  });
+
+  // Upload & Form State (Existing Tabs)
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [docTitle, setDocTitle] = useState('');
   const [uploading, setUploading] = useState(false);
@@ -89,17 +131,13 @@ export const PatientPortal: React.FC = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [meRes, consultationsRes, doctorsRes] = await Promise.all([
+      const [meRes, doctorsRes] = await Promise.all([
         api.get('/auth/me'),
-        api.get('/consultations'),
         api.get('/doctors'),
       ]);
 
       if (meRes.data.success) {
         setProfile(meRes.data.data);
-      }
-      if (consultationsRes.data.success) {
-        setConsultations(consultationsRes.data.data);
       }
       if (doctorsRes.data.success) {
         setDoctors(doctorsRes.data.data);
@@ -112,6 +150,146 @@ export const PatientPortal: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Case Modals Helpers & State Mutators
+  const handleOpenAddRecord = (c: MedicalCase) => {
+    setSelectedCase(c);
+    setShowAddRecordPicker(true);
+  };
+
+  const handleSelectRecordAction = (actionType: 'prescription' | 'diagnosis' | 'report' | 'note') => {
+    setShowAddRecordPicker(false);
+    if (actionType === 'prescription') setShowAddPrescription(true);
+    if (actionType === 'diagnosis') setShowAddDiagnosis(true);
+    if (actionType === 'report') setShowAddReport(true);
+    if (actionType === 'note') setShowAddNote(true);
+  };
+
+  // Case Mutation Handlers (Frontend Mock State Only)
+  const handleSavePrescription = (newRx: PrescriptionItem) => {
+    if (!selectedCase) return;
+    setMedicalCases((prevCases) =>
+      prevCases.map((c) => {
+        if (c.id === selectedCase.id) {
+          const updated = {
+            ...c,
+            prescriptions: [...c.prescriptions, newRx],
+            timeline: [
+              ...c.timeline,
+              {
+                id: `tl-${Date.now()}`,
+                date: newRx.date,
+                title: 'Prescription Added',
+                description: `${newRx.fileName} issued by ${newRx.doctorName}`,
+                type: 'prescription' as const,
+              },
+            ],
+          };
+          setSelectedCase(updated);
+          return updated;
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleSaveDiagnosis = (newDiag: DiagnosisItem) => {
+    if (!selectedCase) return;
+    setMedicalCases((prevCases) =>
+      prevCases.map((c) => {
+        if (c.id === selectedCase.id) {
+          const updated = {
+            ...c,
+            diagnoses: [...c.diagnoses, newDiag],
+            timeline: [
+              ...c.timeline,
+              {
+                id: `tl-${Date.now()}`,
+                date: newDiag.date,
+                title: 'Diagnosis Added',
+                description: `${newDiag.diagnosis} recorded by ${newDiag.doctorName}`,
+                type: 'diagnosis' as const,
+              },
+            ],
+          };
+          setSelectedCase(updated);
+          return updated;
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleSaveReport = (newRep: ReportItem) => {
+    if (!selectedCase) return;
+    setMedicalCases((prevCases) =>
+      prevCases.map((c) => {
+        if (c.id === selectedCase.id) {
+          const updated = {
+            ...c,
+            reports: [...c.reports, newRep],
+            timeline: [
+              ...c.timeline,
+              {
+                id: `tl-${Date.now()}`,
+                date: newRep.date,
+                title: `${newRep.reportType} Report Added`,
+                description: `${newRep.fileName} attached to case file`,
+                type: 'report' as const,
+              },
+            ],
+          };
+          setSelectedCase(updated);
+          return updated;
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleSaveDoctorNote = (newNote: DoctorNoteItem) => {
+    if (!selectedCase) return;
+    setMedicalCases((prevCases) =>
+      prevCases.map((c) => {
+        if (c.id === selectedCase.id) {
+          const updated = {
+            ...c,
+            doctorNotes: [...c.doctorNotes, newNote],
+            timeline: [
+              ...c.timeline,
+              {
+                id: `tl-${Date.now()}`,
+                date: newNote.date,
+                title: 'Doctor Note Added',
+                description: `Note added by ${newNote.doctorName}`,
+                type: 'note' as const,
+              },
+            ],
+          };
+          setSelectedCase(updated);
+          return updated;
+        }
+        return c;
+      })
+    );
+  };
+
+  const handleOpenDocumentPreview = (
+    title: string,
+    date: string,
+    doctorName: string,
+    fileName: string,
+    notes?: string
+  ) => {
+    setPreviewDoc({
+      isOpen: true,
+      title,
+      date,
+      doctorName,
+      fileName,
+      notes,
+    });
   };
 
   // Web Audio Recording Controls
@@ -211,9 +389,6 @@ export const PatientPortal: React.FC = () => {
         setActiveJobId(res.data.data.aiJobId);
         setActiveTab('status');
         fetchData();
-        setTimeout(() => {
-          fetchData();
-        }, 1500);
       }
     } catch (err: any) {
       const serverErr = err.response?.data?.error;
@@ -259,21 +434,43 @@ export const PatientPortal: React.FC = () => {
 
   const handleBookConsultation = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chiefComplaint || !selectedDoctor) return;
+    if (!chiefComplaint) return;
 
     try {
       setBooking(true);
-      const res = await api.post('/consultations', {
-        doctorId: selectedDoctor,
-        chiefComplaint,
-        symptoms: chiefComplaint.split(',').map((s) => s.trim()),
+      // Create new Medical Case Card in frontend mock state
+      const formattedDate = new Date().toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
       });
 
-      if (res.data.success) {
-        setShowBookModal(false);
-        setChiefComplaint('');
-        fetchData();
-      }
+      const newCase: MedicalCase = {
+        id: `case-${Date.now()}`,
+        title: chiefComplaint,
+        status: 'ACTIVE',
+        startDate: formattedDate,
+        symptoms: chiefComplaint.split(',').map((s) => s.trim()),
+        diagnoses: [],
+        prescriptions: [],
+        reports: [],
+        doctorNotes: [],
+        voiceConsultationTranscript: chiefComplaint,
+        clinicalSummary: `New medical case file created for: ${chiefComplaint}. Awaiting physician evaluation.`,
+        timeline: [
+          {
+            id: `tl-${Date.now()}`,
+            date: formattedDate,
+            title: 'Consultation Initiated',
+            description: `Patient opened new case file for ${chiefComplaint}`,
+            type: 'doctor',
+          },
+        ],
+      };
+
+      setMedicalCases((prev) => [newCase, ...prev]);
+      setShowBookModal(false);
+      setChiefComplaint('');
     } catch (err: any) {
       console.error('Error booking consultation:', err);
     } finally {
@@ -288,7 +485,7 @@ export const PatientPortal: React.FC = () => {
   };
 
   const portalTabs: TabItem[] = [
-    { id: 'history', label: 'Medical History & Files', icon: <FileText className="w-3.5 h-3.5 text-teal-600" /> },
+    { id: 'history', label: 'Medical Cases & History', icon: <FileText className="w-3.5 h-3.5 text-teal-600" /> },
     { id: 'voice', label: 'Voice Consultation', icon: <Mic className="w-3.5 h-3.5 text-teal-600" /> },
     { id: 'prescription', label: 'Prescription Upload', icon: <Upload className="w-3.5 h-3.5 text-teal-600" /> },
     { id: 'report', label: 'Medical Report Upload', icon: <FileIcon className="w-3.5 h-3.5 text-teal-600" /> },
@@ -307,13 +504,13 @@ export const PatientPortal: React.FC = () => {
           <div>
             <div className="flex items-center gap-2 text-teal-700 font-bold text-xs uppercase tracking-widest">
               <User className="w-4 h-4 text-teal-600" />
-              <span>Patient Case Portal</span>
+              <span>Patient Medical Records Portal</span>
             </div>
             <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1 tracking-tight">
               Welcome, {userName}
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1 font-medium">
-              Upload medical documents, record voice notes, and track real-time clinical case processing.
+              View medical cases, attached prescriptions, laboratory reports, and complete case timelines.
             </p>
           </div>
 
@@ -326,7 +523,7 @@ export const PatientPortal: React.FC = () => {
           </button>
         </div>
 
-        {/* React Bits Tab Switcher */}
+        {/* Tab Switcher */}
         <AnimatedTabs
           tabs={portalTabs}
           activeTab={activeTab}
@@ -334,67 +531,70 @@ export const PatientPortal: React.FC = () => {
           className="mb-6"
         />
 
-        {/* Tab 1: Medical History & Consultations */}
+        {/* Tab 1: Medical Cases & History Cards */}
         {activeTab === 'history' && (
-          <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm">
-            <h3 className="text-base font-bold text-slate-900 mb-6 flex items-center gap-2 border-b border-slate-100 pb-3">
-              <FolderOpen className="w-5 h-5 text-teal-600" />
-              <span>Consultation History & Lifecycle Status</span>
-            </h3>
+          <div className="space-y-6">
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+                <h3 className="text-base font-extrabold text-slate-900 flex items-center gap-2">
+                  <FolderOpen className="w-5 h-5 text-teal-600" />
+                  <span>Consultation History & Medical Cases ({medicalCases.length})</span>
+                </h3>
 
-            {loading ? (
-              <div className="text-center py-12 text-slate-400 text-xs font-medium">Loading consultations...</div>
-            ) : consultations.length === 0 ? (
-              <div className="text-center py-12 text-slate-400 text-xs font-medium">
-                No consultations recorded yet. Click "Book New Consultation" to start.
+                <span className="text-xs text-slate-400 font-medium">
+                  Showing structured medical case cards & attached records
+                </span>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {consultations.map((c) => (
-                  <SpotlightCard key={c._id} className="p-5">
-                    <div className="flex items-start justify-between mb-3">
-                      <div>
-                        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">
-                          Consultation Case
-                        </span>
-                        <h4 className="font-bold text-slate-900 text-base">{c.chiefComplaint}</h4>
-                      </div>
-                      <StatusPill status={c.status || 'PENDING_REVIEW'} />
-                    </div>
 
-                    <div className="space-y-1.5 text-xs text-slate-600 font-medium mb-4">
-                      <p className="flex items-center gap-1.5">
-                        <Stethoscope className="w-3.5 h-3.5 text-teal-600" />
-                        <span>Doctor: {c.doctorId?.userId?.fullName || 'Assigned Physician'}</span>
-                      </p>
-                      <p className="flex items-center gap-1.5">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Date: {new Date(c.createdAt).toLocaleDateString()}</span>
-                      </p>
-                    </div>
-
-                    {c.verifiedRecordId && (
-                      <div className="p-3 bg-teal-50 border border-teal-200/80 rounded-xl text-xs text-teal-900 font-medium">
-                        <div className="flex items-center gap-1.5 font-bold text-teal-800 mb-1">
-                          <CheckCircle2 className="w-4 h-4 text-teal-600" />
-                          <span>Doctor Verified Diagnosis</span>
-                        </div>
-                        <p className="text-slate-700">{c.verifiedRecordId.finalDiagnosis?.join(', ')}</p>
-                      </div>
-                    )}
-                  </SpotlightCard>
-                ))}
-              </div>
-            )}
+              {loading ? (
+                <div className="text-center py-12 text-slate-400 text-xs font-medium">
+                  Loading medical records...
+                </div>
+              ) : medicalCases.length === 0 ? (
+                <div className="text-center py-12 text-slate-400 text-xs font-medium">
+                  No medical cases recorded yet. Click "Book New Consultation" to initiate a case file.
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  {medicalCases.map((c) => (
+                    <MedicalCaseCard
+                      key={c.id}
+                      medicalCase={c}
+                      onOpenAddRecord={handleOpenAddRecord}
+                      onViewDiagnoses={(caseObj) => {
+                        setSelectedCase(caseObj);
+                        setRecordHistoryType('diagnoses');
+                      }}
+                      onViewPrescriptions={(caseObj) => {
+                        setSelectedCase(caseObj);
+                        setShowPrescriptionHistory(true);
+                      }}
+                      onViewReports={(caseObj) => {
+                        setSelectedCase(caseObj);
+                        setRecordHistoryType('reports');
+                      }}
+                      onViewNotes={(caseObj) => {
+                        setSelectedCase(caseObj);
+                        setRecordHistoryType('notes');
+                      }}
+                      onViewCompleteCase={(caseObj) => {
+                        setSelectedCase(caseObj);
+                        setShowCompleteCase(true);
+                      }}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         )}
 
-        {/* Tab 2: Voice Consultation (Whisper ASR) */}
+        {/* Tab 2: Voice Consultation */}
         {activeTab === 'voice' && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm max-w-2xl mx-auto">
             <h3 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
               <Mic className="w-5 h-5 text-teal-600" />
-              <span>Voice Consultation (Hugging Face Whisper ASR)</span>
+              <span>Voice Consultation (Whisper ASR)</span>
             </h3>
             <p className="text-xs text-slate-500 font-medium mb-6">
               Record your symptoms orally. Whisper ASR will transcribe audio and extract clinical findings automatically.
@@ -470,7 +670,7 @@ export const PatientPortal: React.FC = () => {
           </div>
         )}
 
-        {/* Tab 3 & 4: Document Uploads (Prescription / Medical Report) */}
+        {/* Tab 3 & 4: Document Uploads */}
         {(activeTab === 'prescription' || activeTab === 'report') && (
           <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-sm max-w-xl mx-auto">
             <h3 className="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
@@ -572,6 +772,91 @@ export const PatientPortal: React.FC = () => {
           </div>
         )}
       </main>
+
+      {/* MODALS */}
+      {/* 1. Add Record Picker Modal */}
+      <AddRecordModal
+        isOpen={showAddRecordPicker}
+        onClose={() => setShowAddRecordPicker(false)}
+        medicalCase={selectedCase}
+        onSelectAction={handleSelectRecordAction}
+      />
+
+      {/* 2. Add Prescription Modal */}
+      <AddPrescriptionModal
+        isOpen={showAddPrescription}
+        onClose={() => setShowAddPrescription(false)}
+        caseTitle={selectedCase?.title || ''}
+        onSave={handleSavePrescription}
+      />
+
+      {/* 3. Add Diagnosis Modal */}
+      <AddDiagnosisModal
+        isOpen={showAddDiagnosis}
+        onClose={() => setShowAddDiagnosis(false)}
+        caseTitle={selectedCase?.title || ''}
+        onSave={handleSaveDiagnosis}
+      />
+
+      {/* 4. Add Report Modal */}
+      <AddReportModal
+        isOpen={showAddReport}
+        onClose={() => setShowAddReport(false)}
+        caseTitle={selectedCase?.title || ''}
+        onSave={handleSaveReport}
+      />
+
+      {/* 5. Add Doctor Note Modal */}
+      <AddDoctorNoteModal
+        isOpen={showAddNote}
+        onClose={() => setShowAddNote(false)}
+        caseTitle={selectedCase?.title || ''}
+        onSave={handleSaveDoctorNote}
+      />
+
+      {/* 6. Prescription History Modal */}
+      <PrescriptionHistoryModal
+        isOpen={showPrescriptionHistory}
+        onClose={() => setShowPrescriptionHistory(false)}
+        medicalCase={selectedCase}
+        onViewDocument={handleOpenDocumentPreview}
+        onOpenAddPrescription={() => setShowAddPrescription(true)}
+      />
+
+      {/* 7. Diagnoses / Reports / Notes History Modal */}
+      {recordHistoryType && (
+        <RecordHistoryModal
+          isOpen={!!recordHistoryType}
+          onClose={() => setRecordHistoryType(null)}
+          medicalCase={selectedCase}
+          type={recordHistoryType}
+          onViewDocument={handleOpenDocumentPreview}
+          onOpenAddRecord={(type) => {
+            if (type === 'diagnosis') setShowAddDiagnosis(true);
+            if (type === 'report') setShowAddReport(true);
+            if (type === 'note') setShowAddNote(true);
+          }}
+        />
+      )}
+
+      {/* 8. Document Preview Modal */}
+      <DocumentPreviewModal
+        isOpen={previewDoc.isOpen}
+        onClose={() => setPreviewDoc((prev) => ({ ...prev, isOpen: false }))}
+        title={previewDoc.title}
+        date={previewDoc.date}
+        doctorName={previewDoc.doctorName}
+        fileName={previewDoc.fileName}
+        notes={previewDoc.notes}
+      />
+
+      {/* 9. View Complete Case Modal (Full Details & Timeline) */}
+      <CaseDetailsModal
+        isOpen={showCompleteCase}
+        onClose={() => setShowCompleteCase(false)}
+        medicalCase={selectedCase}
+        onViewDocument={handleOpenDocumentPreview}
+      />
 
       {/* Book New Consultation Modal */}
       {showBookModal && (

@@ -62,8 +62,8 @@ services:
           property: url
           append: /api/v1
 
-# 4. Redis Key-Value Store (For BullMQ Job Queue)
-redis:
-  - name: medmitra-redis
+  # 4. Redis Key-Value Store (For BullMQ Job Queue)
+  - type: redis
+    name: medmitra-redis
     plan: free
     ipAllowList: []

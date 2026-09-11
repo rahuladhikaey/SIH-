@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { GridFSBucket, ObjectId } from 'mongodb';
 import { Readable } from 'stream';
 import {
   StorageProvider,
@@ -16,11 +15,11 @@ export class GridFSStorageProvider implements StorageProvider {
     this.bucketName = bucketName;
   }
 
-  private getBucket(): GridFSBucket {
+  private getBucket(): mongoose.mongo.GridFSBucket {
     if (!mongoose.connection.db) {
       throw new Error('Database connection is not initialized yet.');
     }
-    return new GridFSBucket(mongoose.connection.db as any, {
+    return new mongoose.mongo.GridFSBucket(mongoose.connection.db as any, {
       bucketName: this.bucketName,
     });
   }
@@ -49,7 +48,7 @@ export class GridFSStorageProvider implements StorageProvider {
         });
       });
 
-      uploadStream.on('error', (err) => {
+      uploadStream.on('error', (err: any) => {
         logger.error(`GridFS store error for file '${options.filename}': ${err.message}`);
         reject(err);
       });
@@ -90,7 +89,7 @@ export class GridFSStorageProvider implements StorageProvider {
 
       uploadStream.on('finish', finishHandler);
       uploadStream.on('close', finishHandler);
-      uploadStream.on('error', (err) => {
+      uploadStream.on('error', (err: any) => {
         if (!done) {
           done = true;
           logger.error(`GridFS storeBuffer error for file '${options.filename}': ${err.message}`);
@@ -107,7 +106,7 @@ export class GridFSStorageProvider implements StorageProvider {
 
   public async retrieve(fileId: string): Promise<RetrievedFileResult> {
     const bucket = this.getBucket();
-    const _id = new ObjectId(fileId);
+    const _id = new mongoose.Types.ObjectId(fileId);
 
     const files = await bucket.find({ _id }).toArray();
     if (!files || files.length === 0) {
@@ -128,7 +127,7 @@ export class GridFSStorageProvider implements StorageProvider {
   public async delete(fileId: string): Promise<boolean> {
     try {
       const bucket = this.getBucket();
-      const _id = new ObjectId(fileId);
+      const _id = new mongoose.Types.ObjectId(fileId);
       await bucket.delete(_id);
       return true;
     } catch (err: any) {
@@ -140,7 +139,7 @@ export class GridFSStorageProvider implements StorageProvider {
   public async exists(fileId: string): Promise<boolean> {
     try {
       const bucket = this.getBucket();
-      const _id = new ObjectId(fileId);
+      const _id = new mongoose.Types.ObjectId(fileId);
       const files = await bucket.find({ _id }).toArray();
       return files.length > 0;
     } catch (err) {
